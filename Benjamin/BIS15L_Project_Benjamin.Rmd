@@ -1,0 +1,19 @@
+---
+title: "Epidemology: HIV/AIDS"
+author: "Benjamin Prieto"
+date: "2/15/2022"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r}
+hiv.data <- read.csv("desktop/bis15l_group4/Benjamin/dohmh-hiv-aids-annual-report-1.csv") %>% 
+  clean_names()
+hiv.data
+```
+
+```{r}
+table(as.factor(hiv.data$gender))
+```
+
