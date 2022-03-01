@@ -1,0 +1,98 @@
+---
+title: "Epidemology: HIV/AIDS"
+author: "Benjamin Prieto"
+date: "2/15/2022"
+output: 
+  html_document: 
+    keep_md: yes
+---
+# Setup
+
+### Load Packages
+```{r}
+library("tidyverse")
+library("ggplot2")
+library("janitor")
+library("naniar")
+```
+
+### Load Data  
+
+[Data Source](https://data.world/city-of-ny/fju2-rdad)
+```{r}
+data_raw <- read_csv("dohmh-hiv-aids-annual-report-1.csv") 
+data_raw
+```
+
+### Raw Data Overview
+
+```{r}
+glimpse(data_raw)
+```
+
+```{r}
+miss_var_summary(data_raw)
+```
+
+```{r}
+summary(data_raw)
+```
+
+
+### Data Cleanup
+
+```{r}
+data_clean <- data_raw %>% 
+  clean_names() %>% 
+  na_if("99999") %>% 
+  filter(gender != "All",
+         borough != "All",
+         uhf != "All")
+data_clean
+```
+
+*Note: `age` is compiled based on `race` and vice versa, so no analyses can be done looking at the intersection of age and race. Careful with these two variables during analyses.
+
+### Clean Data Overview
+
+```{r}
+glimpse(data_clean)
+```
+
+```{r}
+miss_var_summary(data_clean)
+```
+
+```{r}
+summary(data_clean)
+```
+
+### Data Columns Breakdown
+
+[Source](https://data.cityofnewyork.us/Health/DOHMH-HIV-AIDS-Annual-Report/fju2-rdad)
+
+*Year* = Self-explanatory
+*Borough* = Borough of residence at HIV diagnosis for HIV diagnoses, HIV diagnosis rate, Concurrent diagnoses, and % linked to care within 3 months; Borough of residence at AIDS diagnosis for AIDS diagnoses and AIDS diagnosis rates; Borough of residence at most recent address for PLWDHI prevalence and % viral suppression; Borough of residence at death for Deaths and all death rates.
+*UHF* = United Hospital Fund neighborhood of residence at HIV diagnosis for HIV diagnoses, HIV diagnosis rates, Concurrent diagnoses, and % Linked to care within 3 months; UHF of residence at AIDS diagnosis for AIDS diagnoses and AIDS diagnosis rates; UHF of residence at most recent address for PLWDHI prevalence and % viral suppression; UHF of residence at death for Deaths and all death rates.
+*Gender* = Gender: when Borough, UHF, Age, and Race categories are all equal to 'All', Gender is displayed as Male, Female, and Transgender (mutually exclusive categories). In all other rows, Male includes transgender men and Female includes transgender women.
+*Age* = Age at HIV diagnosis for HIV diagnoses, HIV diagnosis rates, Concurrent diagnoses, and % Linked to care within 3 months; Age at AIDS diagnosis for AIDS diagnoses and AIDS diagnosis rates; Age as of the end of the given year for PLWDHI prevalence and % viral suppression; Age at death for Deaths and all death rates.
+*Race* = Race/ethnicity; Other/Unknown category includes people of Native American, multiracial, and unknown races.
+*HIV Diagnoses* = Number of HIV diagnoses 13 years of age or older, including those concurrent with AIDS, excluding people known to have been diagnosed outside of NYC
+*HIV Diagnoses Rate* = HIV diagnoses per 100,000 NYC population using annual intercensal population estimates *‘99999’ value indicates suppressed cell representing 1-5 person(s) with an underlying denominator of <=500 people or non-zero cell with a denominator <=100.
+*Concurrent Diagnoses* = Number of HIV diagnoses 13 years of age or older with a concurrent AIDS diagnosis (within 31 days)
+*% Linked to Care Within 3 Months* = Proportion of new HIV diagnoses with an HIV viral load or CD4 test drawn within 3 months (91 days) of HIV diagnosis, following a 7-day lag *‘99999’ value indicates proportion is not calculated because the underlying denominator is equal to zero or is unknown.
+*AIDS Diagnoses* = Number of AIDS diagnoses 13 years of age or older. *‘99999’ value indicates suppressed cell representing 1-5 person(s) with an underlying denominator of <=500 people or non-zero cell with a denominator <=100.
+*AIDS Diagnoses Rate* = AIDS diagnoses per 100,000 NYC population using annual intercensal population estimates. *‘99999’ value indicates rate is not calculated because the underlying denominator is equal to zero or is unknown.
+*PLWDHI Preference* = Estimated number of people 13 years of age or older living with diagnosed HIV infection (PLWDHI) per 100 NYC population using annual intercensal population estimates. *‘99999’ value indicates rate is not calculated because the underlying denominator is equal to zero or is unknown.
+*% Viral Suppression* = Proportion of people living with diagnosed HIV infection 13 years of age or older with at least one viral load test during the calendar year whose last HIV viral load value was ≤200 copies/mL. *‘99999’ value indicates proportion is not calculated because the underlying denominator is equal to zero or is unknown.
+*Deaths* = Number of deaths from any cause among people with HIV/AIDS 13 years of age or older. *‘99999’ value indicates suppressed cell representing 1-5 person(s) with an underlying denominator of <=500 people or non-zero cell with a denominator <=100.
+*Death Rate* = Deaths per 1,000 mid-year people living with HIV/AIDS, excluding deaths in which the person was diagnosed with HIV at the time of death or up to 15 days prior to death. Deaths are age-adjusted to the NYC Census 2010 population and include deaths from any cause (including unknown causes).
+*HIV-related Death Rate* = Death rate for those assigned an HIV-related cause of death. *‘99999’ value indicates rate is not calculated because the underlying denominator is equal to zero or is unknown.
+*Non HIV-related Death Rate* = Death rate for those assigned a non-HIV-related cause of death. *‘99999’ value indicates rate is not calculated because the underlying denominator is equal to zero or is unknown.
+
+# Analyses
+
+Age vs. HIV-related Death Rate
+```{r}
+```
+
