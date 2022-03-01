@@ -1,0 +1,66 @@
+---
+title: "HIV_Group4_JRRRL"
+author: "Justine Reyes Retana"
+date: "2/15/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(paletteer)
+library(janitor)
+library(here)
+```
+
+```{r}
+aids <- readr::read_csv(file = "data/dohmh-hiv-aids-annual-report-1.csv")
+aids
+```
+```{r}
+names(aids)
+```
+
+```{r}
+glimpse(aids)
+```
+
+```{r}
+structure(aids)
+```
+```{r}
+miss_var_summary(aids)
+```
+```{r}
+any_na(aids)
+```
+
+##Clean Data
+```{r}
+aids_clean <- aids%>%
+  clean_names()%>%
+  na_if("99999")%>%
+  filter(gender != "All", 
+         borough != "All",
+         uhf != "All")
+aids_clean
+```
+##Data Analysis
+```{r}
+aids_clean%>%
+  select(race, hiv_related_death_rate)%>%
+  ggplot(aes(x=race, y=hiv_related_death_rate, fill=race))+
+  geom_col()+theme(axis.text.x = element_text(angle = 60, hjust = 1))+coord_flip()+
+  labs(title= "Race vs HIV Related Death Rate", 
+       x="Race", 
+       y="HIV Related Death Rate", 
+       fill = "Race")
+```
+
+Race vs Death Rate. Is there a susceptibility to the disease? 
+Deaths caused by HIV vs the total number of deaths in the city.Find the year with the largest number of deaths caused by HIV complications. 
