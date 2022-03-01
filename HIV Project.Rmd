@@ -1,0 +1,57 @@
+---
+title: "HIV Project"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(paletteer)
+library(janitor)
+library(here)
+```
+
+
+
+```{r}
+options(scipen=999) #cancels the use of scientific notation for the session
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+HIV_data <- read.csv("dohmh-hiv-aids-annual-report-1.csv")
+HIV_data
+```
+```{r}
+HIV_data_clean <- clean_names(HIV_data)
+HIV_data_clean
+```
+
+
+```{r}
+HIV_data_clean%>%
+  group_by(gender)%>%
+  select(hiv_related_death_rate, non_hiv_related_death_rate)%>%
+  ggplot(aes(x= hiv_related_death_rate, y= non_hiv_related_death_rate, fill=gender))+
+  geom_boxplot()
+```
+
+
+
+
+
+
+
+
+
+
