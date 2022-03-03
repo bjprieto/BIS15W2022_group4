@@ -17,7 +17,7 @@ library(janitor)
 
 ### 2015 Data
 ```{r}
-demo_2015_raw <- read.csv("demo_2015acs1yr_nyc.csv")
+demo_2015_raw <- read.csv("data/demo_2015acs1yr_nyc.csv")
 ```
 
 ```{r}
@@ -50,7 +50,7 @@ demo_2015_race
 
 ### 2014 Data
 ```{r}
-demo_2014_raw <- read.csv("demo_2014acs1yr_nyc.csv")
+demo_2014_raw <- read.csv("data/demo_2014acs1yr_nyc.csv")
 ```
 
 ```{r}
@@ -83,7 +83,7 @@ demo_2014_race
 
 ### 2013 Data
 ```{r}
-demo_2013_raw <- read.csv("boro_demo_2013_acs.csv")
+demo_2013_raw <- read.csv("data/boro_demo_2013_acs.csv")
 ```
 
 ```{r}
@@ -116,7 +116,7 @@ demo_2013_race
 
 ### 2012 Data
 ```{r}
-demo_2012_raw <- read.csv("boro_demo_2012_acs.csv")
+demo_2012_raw <- read.csv("data/boro_demo_2012_acs.csv")
 ```
 
 ```{r}
@@ -149,7 +149,7 @@ demo_2012_race
 
 ### 2011 Data
 ```{r}
-demo_2011_raw <- read_csv("boro_demo_2011_acs.csv") %>% 
+demo_2011_raw <- read_csv("data/boro_demo_2011_acs.csv") %>% 
   clean_names()
 ```
 

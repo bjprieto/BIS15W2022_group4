@@ -27,7 +27,7 @@ library("shinydashboard")
 
 [Data Source](https://data.world/city-of-ny/fju2-rdad)
 ```{r}
-data_raw <- read_csv("dohmh-hiv-aids-annual-report-1.csv") 
+data_raw <- read_csv("data/dohmh-hiv-aids-annual-report-1.csv") 
 data_raw
 ```
 
@@ -113,12 +113,12 @@ HIV/AIDS data from the HIV Surveillance Annual Report * Note: Data reported to t
 
 Data frames of New York City census data regarding age and race from 2011 to 2015 was compiled in a separate rmd (`nyc_demographics.Rmd`) to keep this rmd clean and focused on core focus analyses. These data frames are for comparison between proportions among demographics in the HIV data and the NYC population demographics proportions.
 ```{r}
-demo_age_all <- read.csv("demo_age_all.csv")
+demo_age_all <- read.csv("data/demo_age_all.csv")
 demo_age_all
 ```
 
 ```{r}
-demo_race_all <- read_csv("demo_race_all.csv")
+demo_race_all <- read_csv("data/demo_race_all.csv")
 demo_race_all
 ```
 
