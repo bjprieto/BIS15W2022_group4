@@ -1,0 +1,201 @@
+---
+title: "Making NYC Demographics Data Frames"
+author: "Benjamin Prieto"
+date: '2022-03-03'
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+### Setup
+
+[Data Source](https://www1.nyc.gov/site/planning/planning-level/nyc-population/american-community-survey.page.page) 
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+### 2015 Data
+```{r}
+demo_2015_raw <- read.csv("demo_2015acs1yr_nyc.csv")
+```
+
+```{r}
+demo_2015_age <- demo_2015_raw %>% 
+  select(DP05..ACS.DEMOGRAPHIC.AND.HOUSING.ESTIMATES:X.3) %>% 
+  slice(12:24)
+colnames(demo_2015_age) <- c("age_group","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2015_age$population <- str_remove(string = demo_2015_age$population, pattern = ",")
+demo_2015_age$population <- str_remove(string = demo_2015_age$population, pattern = ",")
+demo_2015_age$population <- as.numeric(demo_2015_age$population)
+demo_2015_age <- demo_2015_age %>% 
+  select(age_group, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2015)
+demo_2015_age
+```
+
+```{r}
+demo_2015_race <- demo_2015_raw %>% 
+  select(DP05..ACS.DEMOGRAPHIC.AND.HOUSING.ESTIMATES:X.3) %>% 
+  slice(c(47:49, 54, 62, 67, 68))
+colnames(demo_2015_race) <- c("race","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2015_race$population <- str_remove(string = demo_2015_race$population, pattern = ",")
+demo_2015_race$population <- str_remove(string = demo_2015_race$population, pattern = ",")
+demo_2015_race$population <- as.numeric(demo_2015_race$population)
+demo_2015_race <- demo_2015_race %>% 
+  select(race, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2015)
+demo_2015_race
+```
+
+### 2014 Data
+```{r}
+demo_2014_raw <- read.csv("demo_2014acs1yr_nyc.csv")
+```
+
+```{r}
+demo_2014_age <- demo_2014_raw %>% 
+  select(DP05..ACS.DEMOGRAPHIC.AND.HOUSING.ESTIMATES:X.3) %>% 
+  slice(12:24)
+colnames(demo_2014_age) <- c("age_group","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2014_age$population <- str_remove(string = demo_2014_age$population, pattern = ",")
+demo_2014_age$population <- str_remove(string = demo_2014_age$population, pattern = ",")
+demo_2014_age$population <- as.numeric(demo_2014_age$population)
+demo_2014_age <- demo_2014_age %>% 
+  select(age_group, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2014)
+demo_2014_age
+```
+
+```{r}
+demo_2014_race <- demo_2014_raw %>% 
+  select(DP05..ACS.DEMOGRAPHIC.AND.HOUSING.ESTIMATES:X.3) %>% 
+  slice(c(47:49, 54, 62, 67, 68))
+colnames(demo_2014_race) <- c("race","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2014_race$population <- str_remove(string = demo_2014_race$population, pattern = ",")
+demo_2014_race$population <- str_remove(string = demo_2014_race$population, pattern = ",")
+demo_2014_race$population <- as.numeric(demo_2014_race$population)
+demo_2014_race <- demo_2014_race %>% 
+  select(race, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2014)
+demo_2014_race
+```
+
+### 2013 Data
+```{r}
+demo_2013_raw <- read.csv("boro_demo_2013_acs.csv")
+```
+
+```{r}
+demo_2013_age <- demo_2013_raw %>% 
+  select(DP05..ACS.DEMOGRAPHIC.AND.HOUSING.ESTIMATES:X.3) %>% 
+  slice(12:24)
+colnames(demo_2013_age) <- c("age_group","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2013_age$population <- str_remove(string = demo_2013_age$population, pattern = ",")
+demo_2013_age$population <- str_remove(string = demo_2013_age$population, pattern = ",")
+demo_2013_age$population <- as.numeric(demo_2013_age$population)
+demo_2013_age <- demo_2013_age %>% 
+  select(age_group, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2013)
+demo_2013_age
+```
+
+```{r}
+demo_2013_race <- demo_2013_raw %>% 
+  select(DP05..ACS.DEMOGRAPHIC.AND.HOUSING.ESTIMATES:X.3) %>% 
+  slice(c(47:49, 54, 62, 67, 68))
+colnames(demo_2013_race) <- c("race","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2013_race$population <- str_remove(string = demo_2013_race$population, pattern = ",")
+demo_2013_race$population <- str_remove(string = demo_2013_race$population, pattern = ",")
+demo_2013_race$population <- as.numeric(demo_2013_race$population)
+demo_2013_race <- demo_2013_race %>% 
+  select(race, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2013)
+demo_2013_race
+```
+
+### 2012 Data
+```{r}
+demo_2012_raw <- read.csv("boro_demo_2012_acs.csv")
+```
+
+```{r}
+demo_2012_age <- demo_2012_raw %>% 
+  select(DP05..ACS.DEMOGRAPHIC.AND.HOUSING.ESTIMATES:X.3) %>% 
+  slice(11:23)
+colnames(demo_2012_age) <- c("age_group","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2012_age$population <- str_remove(string = demo_2012_age$population, pattern = ",")
+demo_2012_age$population <- str_remove(string = demo_2012_age$population, pattern = ",")
+demo_2012_age$population <- as.numeric(demo_2012_age$population)
+demo_2012_age <- demo_2012_age %>% 
+  select(age_group, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2012)
+demo_2012_age
+```
+
+```{r}
+demo_2012_race <- demo_2012_raw %>% 
+  select(DP05..ACS.DEMOGRAPHIC.AND.HOUSING.ESTIMATES:X.3) %>% 
+  slice(c(46:48, 53, 61, 66, 67))
+colnames(demo_2012_race) <- c("race","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2012_race$population <- str_remove(string = demo_2012_race$population, pattern = ",")
+demo_2012_race$population <- str_remove(string = demo_2012_race$population, pattern = ",")
+demo_2012_race$population <- as.numeric(demo_2012_race$population)
+demo_2012_race <- demo_2012_race %>% 
+  select(race, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2012)
+demo_2012_race
+```
+
+### 2011 Data
+```{r}
+demo_2011_raw <- read_csv("boro_demo_2011_acs.csv") %>% 
+  clean_names()
+```
+
+```{r}
+demo_2011_age <- demo_2011_raw %>% 
+  select(dp05_acs_demographic_and_housing_estimates:x3) %>% 
+  slice(11:23)
+colnames(demo_2011_age) <- c("age_group","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2011_age$population <- str_remove(string = demo_2011_age$population, pattern = ",")
+demo_2011_age$population <- str_remove(string = demo_2011_age$population, pattern = ",")
+demo_2011_age$population <- as.numeric(demo_2011_age$population)
+demo_2011_age <- demo_2011_age %>% 
+  select(age_group, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2011)
+demo_2011_age
+```
+
+```{r}
+demo_2011_race <- demo_2011_raw %>% 
+  select(dp05_acs_demographic_and_housing_estimates:x3) %>% 
+  slice(c(40:42, 47, 55, 60, 61))
+colnames(demo_2011_race) <- c("race","population","margin_error","percent_pop_for_year","percent_pop_for_year_margin_error")
+demo_2011_race$population <- str_remove(string = demo_2011_race$population, pattern = ",")
+demo_2011_race$population <- str_remove(string = demo_2011_race$population, pattern = ",")
+demo_2011_race$population <- as.numeric(demo_2011_race$population)
+demo_2011_race <- demo_2011_race %>% 
+  select(race, population) %>% 
+  mutate(percent_pop_for_year = 100*population/sum(population), year = 2011)
+demo_2011_race
+```
+### Join Data Frames
+
+```{r}
+demo_age_list <- list(demo_2011_age, demo_2012_age, demo_2013_age, demo_2014_age, demo_2015_age)
+demo_age_all <- bind_rows(demo_age_list)
+demo_age_all
+```
+
+```{r}
+demo_race_list <- list(demo_2011_race, demo_2012_race, demo_2013_race, demo_2014_race, demo_2015_race)
+demo_race_all <- bind_rows(demo_race_list)
+demo_race_all
+```
+
+```{r}
+write_csv(demo_age_all, "demo_age_all.csv")
+write_csv(demo_race_all, "demo_race_all.csv")
+```
+

@@ -6,17 +6,24 @@ output:
   html_document: 
     keep_md: yes
 ---
+
+My Focus: HIV and AIDS, disproportional affected groups/demographics over time
+
 # Setup
 
-### Load Packages
+## Load Packages
 ```{r}
 library("tidyverse")
 library("ggplot2")
 library("janitor")
 library("naniar")
+library("shiny")
+library("shinydashboard")
 ```
 
-### Load Data  
+## Load Data  
+
+### NYC HIV Data
 
 [Data Source](https://data.world/city-of-ny/fju2-rdad)
 ```{r}
@@ -47,7 +54,8 @@ data_clean <- data_raw %>%
   na_if("99999") %>% 
   filter(gender != "All",
          borough != "All",
-         uhf != "All")
+         uhf != "All") %>% 
+  select(-uhf, -percent_linked_to_care_within_3_months) #remove variables not of interest
 data_clean
 ```
 
@@ -67,20 +75,29 @@ miss_var_summary(data_clean)
 summary(data_clean)
 ```
 
-### Data Columns Breakdown
+```{r}
+names(data_clean)
+```
+
+
+### HIV Data Breakdown
 
 [Source](https://data.cityofnewyork.us/Health/DOHMH-HIV-AIDS-Annual-Report/fju2-rdad)
 
+**Summary**
+
+HIV/AIDS data from the HIV Surveillance Annual Report * Note: Data reported to the HIV Epidemiology and Field Services Program by June 30, 2016. All data shown are for people ages 13 and older. Borough-wide and citywide totals may include cases assigned to a borough with an unknown UHF or assigned to NYC with an unknown borough, respectively. Therefore, UHF totals may not sum to borough totals and borough totals may not sum to citywide totals."
+
 *Year* = Self-explanatory
 *Borough* = Borough of residence at HIV diagnosis for HIV diagnoses, HIV diagnosis rate, Concurrent diagnoses, and % linked to care within 3 months; Borough of residence at AIDS diagnosis for AIDS diagnoses and AIDS diagnosis rates; Borough of residence at most recent address for PLWDHI prevalence and % viral suppression; Borough of residence at death for Deaths and all death rates.
-*UHF* = United Hospital Fund neighborhood of residence at HIV diagnosis for HIV diagnoses, HIV diagnosis rates, Concurrent diagnoses, and % Linked to care within 3 months; UHF of residence at AIDS diagnosis for AIDS diagnoses and AIDS diagnosis rates; UHF of residence at most recent address for PLWDHI prevalence and % viral suppression; UHF of residence at death for Deaths and all death rates.
+*UHF (removed)* = United Hospital Fund neighborhood of residence at HIV diagnosis for HIV diagnoses, HIV diagnosis rates, Concurrent diagnoses, and % Linked to care within 3 months; UHF of residence at AIDS diagnosis for AIDS diagnoses and AIDS diagnosis rates; UHF of residence at most recent address for PLWDHI prevalence and % viral suppression; UHF of residence at death for Deaths and all death rates.
 *Gender* = Gender: when Borough, UHF, Age, and Race categories are all equal to 'All', Gender is displayed as Male, Female, and Transgender (mutually exclusive categories). In all other rows, Male includes transgender men and Female includes transgender women.
 *Age* = Age at HIV diagnosis for HIV diagnoses, HIV diagnosis rates, Concurrent diagnoses, and % Linked to care within 3 months; Age at AIDS diagnosis for AIDS diagnoses and AIDS diagnosis rates; Age as of the end of the given year for PLWDHI prevalence and % viral suppression; Age at death for Deaths and all death rates.
 *Race* = Race/ethnicity; Other/Unknown category includes people of Native American, multiracial, and unknown races.
 *HIV Diagnoses* = Number of HIV diagnoses 13 years of age or older, including those concurrent with AIDS, excluding people known to have been diagnosed outside of NYC
 *HIV Diagnoses Rate* = HIV diagnoses per 100,000 NYC population using annual intercensal population estimates *‘99999’ value indicates suppressed cell representing 1-5 person(s) with an underlying denominator of <=500 people or non-zero cell with a denominator <=100.
 *Concurrent Diagnoses* = Number of HIV diagnoses 13 years of age or older with a concurrent AIDS diagnosis (within 31 days)
-*% Linked to Care Within 3 Months* = Proportion of new HIV diagnoses with an HIV viral load or CD4 test drawn within 3 months (91 days) of HIV diagnosis, following a 7-day lag *‘99999’ value indicates proportion is not calculated because the underlying denominator is equal to zero or is unknown.
+*% Linked to Care Within 3 Months (removed)* = Proportion of new HIV diagnoses with an HIV viral load or CD4 test drawn within 3 months (91 days) of HIV diagnosis, following a 7-day lag *‘99999’ value indicates proportion is not calculated because the underlying denominator is equal to zero or is unknown.
 *AIDS Diagnoses* = Number of AIDS diagnoses 13 years of age or older. *‘99999’ value indicates suppressed cell representing 1-5 person(s) with an underlying denominator of <=500 people or non-zero cell with a denominator <=100.
 *AIDS Diagnoses Rate* = AIDS diagnoses per 100,000 NYC population using annual intercensal population estimates. *‘99999’ value indicates rate is not calculated because the underlying denominator is equal to zero or is unknown.
 *PLWDHI Preference* = Estimated number of people 13 years of age or older living with diagnosed HIV infection (PLWDHI) per 100 NYC population using annual intercensal population estimates. *‘99999’ value indicates rate is not calculated because the underlying denominator is equal to zero or is unknown.
@@ -90,9 +107,296 @@ summary(data_clean)
 *HIV-related Death Rate* = Death rate for those assigned an HIV-related cause of death. *‘99999’ value indicates rate is not calculated because the underlying denominator is equal to zero or is unknown.
 *Non HIV-related Death Rate* = Death rate for those assigned a non-HIV-related cause of death. *‘99999’ value indicates rate is not calculated because the underlying denominator is equal to zero or is unknown.
 
-# Analyses
+### NYC Demographics Data (2011-2015)
 
-Age vs. HIV-related Death Rate
+[Data Source](https://www1.nyc.gov/site/planning/planning-level/nyc-population/american-community-survey.page.page)  
+
+Data frames of New York City census data regarding age and race from 2011 to 2015 was compiled in a separate rmd (`nyc_demographics.Rmd`) to keep this rmd clean and focused on core focus analyses. These data frames are for comparison between proportions among demographics in the HIV data and the NYC population demographics proportions.
 ```{r}
+demo_age_all <- read.csv("demo_age_all.csv")
+demo_age_all
 ```
 
+```{r}
+demo_race_all <- read_csv("demo_race_all.csv")
+demo_race_all
+```
+
+
+# Analyses
+
+## Time and HIV
+
+HIV Diagnoses Over Time: Have overall HIV diagnoses decreased over time?
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(year) %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses))
+```
+
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(year) %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)) %>% 
+  ggplot(aes(x = year, y = sum_hiv_diagnoses))+
+  geom_col(fill = "mediumorchid4")+
+  labs(x = "Year",
+       y = "HIV Diagnoses",
+       title = "HIV Diagnoses Over Time (2011-2015)")+
+  theme_linedraw()+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+HIV-Related Deaths Over Time: Have overall HIV-related death rates decreased over time?
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(year) %>% 
+  summarize(mean_hiv_death_rate = mean(hiv_related_death_rate))
+```
+
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(year) %>% 
+  summarize(mean_hiv_death_rate = mean(hiv_related_death_rate)) %>% 
+  ggplot(aes(x = year, mean_hiv_death_rate))+
+  geom_col(fill = "mediumorchid4")+
+  labs(x = "Year",
+       y = "Mean HIV-Related Death Rate (%)",
+       title = "HIV-Related Death Rate Over Time (2011-2015)")+
+  theme_linedraw()+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+## Age and HIV
+
+HIV Diagnoses by Age: Are HIV diagnoses disproportional across age groups?
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(age) %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses))
+```
+
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(age) %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)) %>% 
+  ggplot(aes(x = age, y = sum_hiv_diagnoses))+
+  geom_col(fill = "mediumorchid4")+
+  labs(x = "Age Group",
+       y = "HIV Diagnoses",
+       title = "HIV Diagnoses by Age Group (2011-2015)")+
+  theme_linedraw()+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+HIV Diagnosis vs. Age Over Time: How does HIV diagnoses change over time across all age groups?
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(age, year) %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses))
+```
+
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(age, year) %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)) %>% 
+  ggplot(aes(x = year, y = sum_hiv_diagnoses, color = age))+
+  geom_line()+
+  labs(x = "Year",
+       y = "HIV Diagnoses",
+       title = "HIV Diagnoses Over Time by Age Group (2011-2015)",
+       color = "Age Group")+
+  theme_linedraw()+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+HIV-related Death Rate by Age Group: Is HIV-related death more or less common across different age groups?  
+
+Expectation: Death rate is more common in older age groups due to age-associated health decline.
+
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(age) %>% 
+  summarize(avg_hiv_related_death_rate = mean(hiv_related_death_rate, na.rm = T))
+```
+
+```{r}
+data_clean %>% 
+  filter(age != "All") %>% 
+  group_by(age) %>% 
+  summarize(avg_hiv_related_death_rate = mean(hiv_related_death_rate, na.rm = T)) %>% 
+  ggplot(aes(x = age, y = avg_hiv_related_death_rate))+
+  geom_col(fill = "mediumorchid4")+
+  labs(x = "Age Group",
+       y = "Average HIV-Related Death Rate (%)",
+       title = "HIV-Related Death Rate by Age Group (2011-2015)")+
+  theme_linedraw()+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Have HIV-related death rates declined over time? Have AIDS-related death rate declined over time?
+```{r}
+
+```
+
+## Race and HIV
+
+HIV Diagnoses vs. Race: Is HIV diagnoses more or less common across different races?
+```{r}
+data_clean %>% 
+  group_by(race) %>% 
+  filter(race != "All") %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses))
+```
+
+```{r}
+data_clean %>% 
+  group_by(race) %>% 
+  filter(race != "All") %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)) %>% 
+  ggplot(aes(x = "", y = sum_hiv_diagnoses, fill = race))+
+  geom_col()+
+  coord_polar(theta = "y")+
+  theme_void()+
+  labs(fill = "Race",
+       x = NULL,
+       y = "HIV Diagnoses",
+       title = "HIV Diagnoses Proportion by Race (2011-2015)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data_clean %>%
+  filter(race != "All") %>% 
+  group_by(year, race) %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses))
+```
+
+```{r}
+data_clean %>% 
+  group_by(race, year) %>% 
+  filter(race != "All") %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)) %>% 
+  ggplot(aes(x = "", y = sum_hiv_diagnoses, fill = race))+
+  geom_col()+
+  coord_polar(theta = "y")+
+  theme_void()+
+  labs(fill = "Race",
+       x = NULL,
+       y = "HIV Diagnoses",
+       title = "HIV Diagnoses Proportion by Race (2011-2015)")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  facet_wrap(~year)
+```
+
+```{r}
+library(shiny)
+
+ui <- dashboardPage(
+  dashboardHeader(title = "HIV Diagnoses"),
+  dashboardSidebar(),
+  dashboardBody(
+    box(title = "Plot Options",
+        selectInput("year", "Select Year", choices = levels(as.factor(data_clean$year)), selected = "2011")),
+    box(title = "HIV Diagnoses by Ethnic Group (2011-2015)",
+        plotOutput("plot"))
+  )
+)
+
+server <- function(input, output, session) {
+  output$plot <- renderPlot({
+    ggplot(data = data_clean %>% 
+             group_by(race, year) %>% 
+             filter(race != "All", year == input$year) %>% 
+             summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)),
+           aes_string(x = "race", y = "sum_hiv_diagnoses"))+
+      geom_col(fill = "mediumorchid4")+
+      labs(x = "Ethnic Group",
+           y = "HIV Diagnoses")+
+      theme_linedraw(base_size = 11.5)
+  })
+  session$onSessionEnded(stopApp)
+}
+
+shinyApp(ui, server)
+```
+
+
+HIV Diagnoses vs. Race Over Time: Is HIV diagnoses more or less common across different races over time?
+```{r}
+data_clean %>% 
+  group_by(race, year) %>% 
+  filter(race != "All") %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses))
+```
+
+```{r}
+data_clean %>% 
+  group_by(race, year) %>% 
+  filter(race != "All") %>% 
+  summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)) %>% 
+  ggplot(aes(x = year, y = sum_hiv_diagnoses, color = race))+
+  geom_line()+
+  theme_linedraw()+
+  labs(x = "Year",
+       y = "HIV Diagnoses",
+       title = "HIV Diagnoses by Race Over Time (2011-2015)",
+       color = "Race")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+HIV-Related Death Rate vs. Race: Does HIV-related death disproportionally affect different ethnicities?
+```{r}
+data_clean %>% 
+  group_by(race) %>% 
+  filter(race != "All") %>% 
+  summarize(avg_hiv_death = mean(hiv_related_death_rate, na.rm = T))
+```
+
+```{r}
+data_clean %>% 
+  group_by(race) %>% 
+  filter(race != "All") %>% 
+  summarize(avg_hiv_death = mean(hiv_related_death_rate, na.rm = T)) %>% 
+  ggplot(aes(x = reorder(race, avg_hiv_death), y = avg_hiv_death))+
+  geom_col(fill = "mediumorchid4")+
+  theme_linedraw()+
+  labs(x = "Race",
+       y = "Average HIV-Related Death Rate",
+       title = "HIV-Related Death Rate by Race (2011-2015)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+HIV-Related Death Rate vs. Race Over Time: Does HIV-related death disproportionally affect different ethnicities over time?
+```{r}
+data_clean %>% 
+  group_by(race, year) %>% 
+  filter(race != "All") %>% 
+  summarize(avg_hiv_death_rate = mean(hiv_related_death_rate, na.rm = T))
+```
+
+```{r}
+data_clean %>% 
+  group_by(race, year) %>% 
+  filter(race != "All") %>% 
+  summarize(avg_hiv_death_rate = mean(hiv_related_death_rate, na.rm = T)) %>% 
+  filter(year != 2015) %>% 
+  ggplot(aes(x = year, y = avg_hiv_death_rate, color = race))+
+  geom_line()+
+  theme_linedraw()+
+  labs(x = "Year",
+       y = "Average HIV-Related Death Rate",
+       title = "HIV-Related Death Rate by Race (2011-2014)",
+       color = "Race")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
