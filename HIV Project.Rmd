@@ -15,6 +15,7 @@ library(RColorBrewer)
 library(paletteer)
 library(janitor)
 library(here)
+library(ggthemes)
 
 
 
@@ -65,8 +66,11 @@ HIV_data_clean%>%
   select(gender, hiv_related_death_rate)%>%
   ggplot(aes(x= gender, y= hiv_related_death_rate, fill=gender))+
   geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
-  geom_violin(alpha = .5, na.rm = TRUE, xlim=c(0,25)) +
-  coord_flip()
+  geom_violin(alpha = .5, na.rm = TRUE) +
+  theme_stata()+
+  theme(axis.text.y = element_text(angle = 360))+
+  coord_flip()+
+  labs(title = " Gender vs. Death Rates",x = "Gender",y= " Death Rate")
 ```
 ```{r}
 HIV_data_clean%>%
@@ -80,12 +84,16 @@ HIV_data_clean%>%
 ```{r}
 HIV_data_clean%>%
   filter(hiv_diagnosis_rate!=99999.0)%>%
+  filter(hiv_diagnosis_rate<=125)%>%
   group_by(gender)%>%
   select(gender, hiv_diagnosis_rate)%>%
   ggplot(aes(x= gender, y= hiv_diagnosis_rate, fill=gender))+
   geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
   geom_violin(alpha = .5, na.rm = TRUE) +
-  coord_flip()
+  theme_stata()+
+  theme(axis.text.y = element_text(angle = 360))+
+  coord_flip()+
+  labs(title = " Gender vs. Diagnosis Rates",x = "Gender",y= " Diagnosis Rate")
 ```
 
 ```{r}
@@ -133,7 +141,10 @@ HIV_data_clean %>%
   summarise(average_diagnosis_rate= mean(hiv_diagnosis_rate))%>%
   ggplot(aes(gender, race, fill= average_diagnosis_rate)) + 
   geom_tile() +
-  scale_fill_gradient(low="yellow", high="red")
+  theme_stata()+
+  theme(axis.text.y = element_text(angle = 360))+
+  scale_fill_gradient(low="yellow", high="red")+
+  labs(title = " Average Diagnosis rate for Gender and Race",x = "Gender",y= " Race")
 
 ```
 ```{r}
@@ -144,7 +155,38 @@ HIV_data_clean %>%
   summarise(average_hiv_realted_death_rate= mean(hiv_related_death_rate))%>%
   ggplot(aes(gender, race, fill= average_hiv_realted_death_rate)) + 
   geom_tile() +
-  scale_fill_gradient(low="yellow", high="red")
+  theme(axis.text.y = element_text(angle = 360))+
+  scale_fill_gradient(low="yellow", high="red")+
+  labs(title = " Average Death rate for Gender and Race",x = "Gender",y= " Race")
 
+```
+```{r}
+HIV_data_clean%>%
+  filter(hiv_related_death_rate!=99999.0)%>%
+  filter(hiv_related_death_rate<=10)%>%
+  group_by(race)%>%
+  select(race, hiv_related_death_rate)%>%
+  ggplot(aes(x= race, y= hiv_related_death_rate, fill=race))+
+  geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
+  geom_violin(alpha = .5, na.rm = TRUE) +
+  theme_stata()+
+  theme(axis.text.y = element_text(angle = 360))+
+  coord_flip()+
+  labs(title = " Race vs. Death Rates",x = "Race",y= " Death Rate")
+```
+
+```{r}
+HIV_data_clean%>%
+  filter(hiv_diagnosis_rate!=99999.0)%>%
+  filter(hiv_diagnosis_rate<=100)%>%
+  group_by(race)%>%
+  select(race, hiv_diagnosis_rate)%>%
+  ggplot(aes(x= race, y= hiv_diagnosis_rate, fill=race))+
+  geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
+  geom_violin(alpha = .5, na.rm = TRUE) +
+  theme_stata()+
+  theme(axis.text.y = element_text(angle = 360))+
+  coord_flip()+
+  labs(title = " Race vs. Diagnosis Rates",x = "Race",y= " Diagnosis Rate")
 ```
 
