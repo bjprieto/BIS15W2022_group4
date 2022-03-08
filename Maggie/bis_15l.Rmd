@@ -1,0 +1,175 @@
+---
+title: "BIS 15L Project"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+```{r}
+getwd()
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+library(ggthemes)
+library(tidyverse)
+library(janitor)
+```
+```{r}
+hiv_data  <- read_csv("dohmh-hiv-aids-annual-report-1.csv")
+hiv_data
+```
+
+```{r}
+names(hiv_data)
+```
+
+```{r}
+clean_hiv_data <- clean_names(hiv_data)
+clean_hiv_data
+```
+
+```{r}
+names(clean_hiv_data)
+```
+# HIV diagnoses included both just HIV diagnoses and those with a concurrent diagnoses of AID- seperated out the two 
+```{r}
+clean_hiv_data <- clean_hiv_data %>% 
+  filter(hiv_diagnoses != "99999") %>%
+  filter(concurrent_diagnoses != "99999") %>% 
+   filter(hiv_related_death_rate != "99999") %>% 
+ filter(death_rate != "99999") %>%
+  mutate(only_hiv_diagnoses=hiv_diagnoses-concurrent_diagnoses)
+```
+
+```{r}
+year_clean_hiv_data <- clean_hiv_data %>% 
+  group_by(year) %>% 
+  mutate(sum_diagnoses=sum(only_hiv_diagnoses))
+clean_hiv_data
+```
+```{r}
+clean_hiv_data %>% 
+  summarize(mean_hiv_diagnoses=mean(hiv_diagnoses),
+            min_hiv_diagnoses=min(hiv_diagnoses),
+            max_hiv_diagnoses=max(hiv_diagnoses))
+```
+
+```{r}
+clean_hiv_data %>%  
+  group_by(year) %>% 
+  filter(concurrent_diagnoses != "99999") %>%
+  summarize(sum_diagnoses=sum(only_hiv_diagnoses)) %>% 
+  ggplot(aes(x=as.factor(year), y=sum_diagnoses, fill=as.factor(year)))+geom_col()+theme_stata()+
+  labs(title="Total HIV Diagnoses by Year",
+       x="Year",
+       y="Total HIV Diagnoses",
+       fill="Year")
+```
+```{r}
+clean_hiv_data %>% 
+  summarize(mean_concurrent_diagnosess=mean(concurrent_diagnoses),
+            min_concurrent_diagnoses=min(concurrent_diagnoses),
+            max_concurrent_diagnoses=max(concurrent_diagnoses))
+```
+
+```{r}
+clean_hiv_data %>%  
+  group_by(year) %>% 
+  filter(concurrent_diagnoses != "99999") %>% 
+ summarize(sum_diagnoses=sum(concurrent_diagnoses)) %>%
+  ggplot(aes(x=as.factor(year), y=sum_diagnoses, fill=as.factor(year)))+geom_col()+theme_stata()+
+  labs(title="Concurrent HIV and AIDs Diagnoses by Year",
+       x="Year",
+       y="Concurrent HIV and AIDs Diagnoses",
+       fill="Year")
+```
+```{r}
+clean_hiv_data %>% 
+  summarize(mean_hiv_related_death_rate=mean(hiv_related_death_rate),
+            min_hiv_related_death_rate=min(hiv_related_death_rate),
+            max_hiv_related_death_rate=max(hiv_related_death_rate))
+```
+
+```{r}
+clean_hiv_data %>%  
+  group_by(year) %>% 
+ filter(hiv_related_death_rate != "99999") %>% 
+ summarize(sum_death_rate=sum(hiv_related_death_rate)) %>%
+  ggplot(aes(x=as.factor(year), y=sum_death_rate, fill=as.factor(year)))+geom_col()+theme_stata()+
+  labs(title="HIV-Related Death Rate by Year",
+       x="Year",
+       y="CHIV-Related Death Rate",
+       fill="Year")
+```
+```{r}
+clean_hiv_data %>% 
+  summarize(mean_death_rate=mean(death_rate),
+            min_death_rate=min(death_rate),
+            max_death_rate=max(death_rate))
+```
+
+```{r}
+clean_hiv_data %>%  
+  group_by(year) %>% 
+ filter(death_rate != "99999") %>% 
+ summarize(other_sum_death_rate=sum(death_rate)) %>%
+  ggplot(aes(x=as.factor(year), y=other_sum_death_rate, fill=as.factor(year)))+geom_col()+theme_stata()+
+  labs(title="Death Rate by Year",
+       x="Year",
+       y="HIV-Related Death Rate",
+       fill="Year")
+```
+```{r}
+death_hiv_data   <- clean_hiv_data %>%  
+  group_by(year) %>% 
+  summarize(sum_death_rate=sum(hiv_related_death_rate), 
+           other_sum_death_rate=sum(death_rate))
+
+  
+```
+
+```{r}
+death_hiv_data %>% 
+ ggplot() + geom_line(data=death_hiv_data, aes(x=year, y=sum_death_rate, fill=year))+ geom_line(data=death_hiv_data, aes(x=year, y=other_sum_death_rate, fill=year))+theme_stata()+
+  labs(title="HIV-Related and Overal Death Rate by Year",
+       x="Year",
+       y="Death",
+       fill="Year")
+```
+
+
+```{r}
+clean_hiv_data %>%  
+  group_by(year) %>% 
+  ggplot(aes(x=as.factor(year), y=log(only_hiv_diagnoses), fill=as.factor(year)))+geom_violin()+theme_linedraw()+
+  labs(title="Total HIV Diagnoses by Year",
+       x="Year",
+       y="Total HIV Diagnoses",
+       fill="Year")
+```
+```{r}
+getwd()
+```
+
