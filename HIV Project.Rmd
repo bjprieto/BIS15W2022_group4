@@ -29,10 +29,6 @@ venn diagram: gender, race and rates
 
 
 ```{r}
-naniar::miss_var_summary(HIV_data)
-```
-
-```{r}
 options(scipen=999) #cancels the use of scientific notation for the session
 ```
 
@@ -51,6 +47,11 @@ Latino/Hispanic
 Other/Unknown
 White
 All
+```{r}
+naniar::miss_var_summary(HIV_data)
+```
+
+
 
 ```{r}
 HIV_data_clean <- clean_names(HIV_data)
@@ -67,7 +68,6 @@ HIV_data_clean%>%
   ggplot(aes(x= gender, y= hiv_related_death_rate, fill=gender))+
   geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
   geom_violin(alpha = .5, na.rm = TRUE) +
-  theme_stata()+
   theme(axis.text.y = element_text(angle = 360))+
   coord_flip()+
   labs(title = " Gender vs. Death Rates",x = "Gender",y= " Death Rate")
@@ -90,7 +90,6 @@ HIV_data_clean%>%
   ggplot(aes(x= gender, y= hiv_diagnosis_rate, fill=gender))+
   geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
   geom_violin(alpha = .5, na.rm = TRUE) +
-  theme_stata()+
   theme(axis.text.y = element_text(angle = 360))+
   coord_flip()+
   labs(title = " Gender vs. Diagnosis Rates",x = "Gender",y= " Diagnosis Rate")
@@ -141,7 +140,6 @@ HIV_data_clean %>%
   summarise(average_diagnosis_rate= mean(hiv_diagnosis_rate))%>%
   ggplot(aes(gender, race, fill= average_diagnosis_rate)) + 
   geom_tile() +
-  theme_stata()+
   theme(axis.text.y = element_text(angle = 360))+
   scale_fill_gradient(low="yellow", high="red")+
   labs(title = " Average Diagnosis rate for Gender and Race",x = "Gender",y= " Race")
@@ -169,7 +167,6 @@ HIV_data_clean%>%
   ggplot(aes(x= race, y= hiv_related_death_rate, fill=race))+
   geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
   geom_violin(alpha = .5, na.rm = TRUE) +
-  theme_stata()+
   theme(axis.text.y = element_text(angle = 360))+
   coord_flip()+
   labs(title = " Race vs. Death Rates",x = "Race",y= " Death Rate")
@@ -184,7 +181,6 @@ HIV_data_clean%>%
   ggplot(aes(x= race, y= hiv_diagnosis_rate, fill=race))+
   geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
   geom_violin(alpha = .5, na.rm = TRUE) +
-  theme_stata()+
   theme(axis.text.y = element_text(angle = 360))+
   coord_flip()+
   labs(title = " Race vs. Diagnosis Rates",x = "Race",y= " Diagnosis Rate")
