@@ -28019,7 +28019,7 @@ HIV_data_clean%>%
   geom_violin(alpha = .5, na.rm = TRUE) +
   theme(axis.text.y = element_text(angle = 360))+
   coord_flip()+
-  labs(title = " Race vs. Death Rates",x = "Race",y= " Death Rate")
+  labs(title = " Race vs. HIV Related Death Rates",x = "Race",y= " Death Rate")
 ```
 
 ![](HIV-Project_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
@@ -28036,8 +28036,23 @@ HIV_data_clean%>%
   geom_violin(alpha = .5, na.rm = TRUE) +
   theme(axis.text.y = element_text(angle = 360))+
   coord_flip()+
-  labs(title = " Race vs. Diagnosis Rates",x = "Race",y= " Diagnosis Rate")
+  labs(title = " Race vs. HIV Diagnosis Rates",x = "Race",y= " Diagnosis Rate")
 ```
 
 ![](HIV-Project_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
+```r
+HIV_data_clean%>%
+  filter(hiv_diagnosis_rate!=99999.0)%>%
+  filter(hiv_diagnosis_rate<=100)%>%
+  group_by(race)%>%
+  select(race, hiv_diagnosis_rate)%>%
+  ggplot(aes(x= race, y= hiv_diagnosis_rate, fill=race))+
+  geom_boxplot(color = "grey", alpha = .3, na.rm = TRUE) +
+  geom_violin(alpha = .5, na.rm = TRUE) +
+  theme(axis.text.y = element_text(angle = 360))+
+  coord_flip()+
+  labs(title = " Race vs. Diagnosis Rates",x = "Race",y= " Diagnosis Rate")
+```
+
+![](HIV-Project_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
