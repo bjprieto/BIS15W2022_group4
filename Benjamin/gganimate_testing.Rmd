@@ -7,7 +7,13 @@ output:
     keep_md: yes
 ---
 
-My Focus: HIV and AIDS, disproportional affected groups/demographics over time
+My Focus: HIV and AIDS, disproportional affected groups/demographics over time  
+
+I wanted to try out the `gganimate` package since I recently saw a cool internet post that used R and this package to create an engaging plot:  
+
+[Plot Link](https://www.reddit.com/r/dataisbeautiful/comments/t3z232/oc_it_looks_like_invading_its_neighbors_can/)
+
+[User's Resource](https://www.reddit.com/r/dataisbeautiful/comments/t3z232/comment/hyvn846/?utm_source=share&utm_medium=web2x&context=3)
 
 # Setup
 
