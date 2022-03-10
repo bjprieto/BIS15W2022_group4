@@ -69,7 +69,7 @@ HIV_data_clean%>%
   geom_violin(alpha = .5, na.rm = TRUE) +
   theme(axis.text.y = element_text(angle = 360))+
   coord_flip()+
-  labs(title = " Gender vs. Death Rates",x = "Gender",y= " Death Rate")
+  labs(title = " Gender vs. HIV Related Death Rates",x = "Gender",y= " Death Rate")
 ```
 ```{r}
 HIV_data_clean%>%
@@ -91,7 +91,7 @@ HIV_data_clean%>%
   geom_violin(alpha = .5, na.rm = TRUE) +
   theme(axis.text.y = element_text(angle = 360))+
   coord_flip()+
-  labs(title = " Gender vs. Diagnosis Rates",x = "Gender",y= " Diagnosis Rate")
+  labs(title = " Gender vs. HIV Diagnosis Rates",x = "Gender",y= " Diagnosis Rate")
 ```
 
 ```{r}
@@ -136,12 +136,12 @@ HIV_data_clean %>%
   filter(gender=="Female" | gender=="Male")%>%
   select(gender, race, hiv_diagnosis_rate)%>%
   group_by(gender, race)%>%
-  summarise(Average_Diagnosis_Rate= mean(hiv_diagnosis_rate))%>%
-  ggplot(aes(gender, race, fill= Average_Diagnosis_Rate)) + 
+  summarise(Average_HIV_Diagnosis_Rate= mean(hiv_diagnosis_rate))%>%
+  ggplot(aes(gender, race, fill= Average_HIV_Diagnosis_Rate)) + 
   geom_tile() +
   theme(axis.text.y = element_text(angle = 360))+
   scale_fill_gradient(low="yellow", high="red")+
-  labs(title = " Average Diagnosis rate for Gender and Race",x = "Gender",y= " Race")
+  labs(title = " Average HIV Diagnosis Rate for Gender and Race",x = "Gender",y= " Race")
 
 ```
 ```{r}
@@ -154,7 +154,7 @@ HIV_data_clean %>%
   geom_tile() +
   theme(axis.text.y = element_text(angle = 360))+
   scale_fill_gradient(low="yellow", high="red")+
-  labs(title = " Average Death rate for Gender and Race",x = "Gender",y= " Race")
+  labs(title = " Average HIV Related Death rate for Gender and Race",x = "Gender",y= " Race")
 
 ```
 ```{r}
