@@ -1,0 +1,225 @@
+---
+title: "gganimate Package"
+author: "Benjamin Prieto"
+date: "2/15/2022"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+My Focus: HIV and AIDS, disproportional affected groups/demographics over time  
+
+I wanted to try out the `gganimate` package since I recently saw a cool internet post that used R and this package to create an engaging plot:  
+
+[Plot Link](https://www.reddit.com/r/dataisbeautiful/comments/t3z232/oc_it_looks_like_invading_its_neighbors_can/)
+
+[User's Resource](https://www.reddit.com/r/dataisbeautiful/comments/t3z232/comment/hyvn846/?utm_source=share&utm_medium=web2x&context=3)
+
+# Setup
+
+## Load Packages
+```{r, echo = F}
+library("tidyverse")
+library("ggplot2")
+library("janitor")
+library("naniar")
+library("RColorBrewer")
+library("ggthemes")
+library("gganimate")
+```
+
+## Load Data  
+
+### NYC HIV/AIDS Data
+
+[Data Source: NYC HIV/AIDS Data (2011-2015)](https://data.world/city-of-ny/fju2-rdad)
+```{r}
+data_raw <- read_csv("data/dohmh-hiv-aids-annual-report-1.csv") 
+```
+
+### Data Cleanup and Clean Data Overview
+
+```{r}
+data_clean <- data_raw %>% 
+  clean_names() %>% 
+  na_if("99999") %>% 
+  filter(gender != "All",
+         borough != "All",
+         uhf != "All") %>% 
+  select(-uhf, -percent_linked_to_care_within_3_months) #remove variables not of interest
+```
+
+*Note: `age` is compiled based on `race` and vice versa, so no analyses can be done looking at the intersection of age and race. Careful with these two variables during analyses.
+
+# Analyses
+
+## Age and HIV
+
+HIV Diagnosis vs. Age Over Time: How does HIV diagnoses change over time across all age groups?
+
+```{r}
+data_clean$year <- as.integer(data_clean$year)
+```
+
+```{r}
+animate(
+  data_clean %>% 
+    filter(age != "All") %>% 
+    select(age, hiv_diagnoses, year) %>% 
+    group_by(age, year) %>% 
+    summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)) %>% 
+    ggplot(aes(x = age, y = sum_hiv_diagnoses, fill = age))+
+    geom_col()+
+    labs(title = "Year: {frame_time}",
+         x = "Age Group",
+         y = "HIV Diagnoses")+
+    theme_stata()+
+    theme(legend.position = "none")+
+    transition_time(year)+
+    ease_aes("linear"),
+  render = gifski_renderer()
+)
+anim_save(file = "hiv_diagnoses_col")
+```
+
+```{r}
+animate( 
+ data_clean %>% 
+    filter(age != "All") %>% 
+    group_by(age, year) %>% 
+    summarize(sum_hiv_diagnoses = sum(hiv_diagnoses)) %>% 
+    ggplot(aes(x = year, y = sum_hiv_diagnoses, color = age))+
+    geom_line()+
+    labs(x = "Year",
+         y = "HIV Diagnoses",
+         title = "HIV Diagnoses Over Time by Age Group (2011-2015)",
+         color = NULL)+
+    theme_stata()+
+   transition_reveal(year),
+ renderer = gifski_renderer(loop = F)
+)
+anim_save(file = "hiv_diagnoses_line")
+```
+
+
+AIDS Diagnoses by Age Over Time: Are AIDS diagnoses disproportional across age groups over time?
+
+```{r}
+animate(
+  data_clean %>% 
+    filter(age != "All") %>% 
+    select(age, aids_diagnoses, year) %>% 
+    group_by(age, year) %>% 
+    summarize(sum_aids_diagnoses = sum(aids_diagnoses)) %>% 
+    ggplot(aes(x = age, y = sum_aids_diagnoses, fill = age))+
+    geom_col()+
+    labs(title = "Year: {frame_time}",
+         x = "Age Group",
+         y = "AIDS Diagnoses")+
+    theme_stata()+
+    theme(legend.position = "none")+
+    transition_time(year)+
+    ease_aes("linear"),
+  render = gifski_renderer()
+)
+anim_save(file = "aids_diagnoses_col")
+```
+
+```{r}
+animate( 
+ data_clean %>% 
+    filter(age != "All") %>% 
+    group_by(age, year) %>% 
+    summarize(sum_aids_diagnoses = sum(aids_diagnoses)) %>% 
+    ggplot(aes(x = year, y = sum_aids_diagnoses, color = age))+
+    geom_line()+
+    labs(x = "Year",
+         y = "AIDS Diagnoses",
+         title = "AIDS Diagnoses Over Time by Age Group (2011-2015)",
+         color = NULL)+
+    theme_stata()+
+   transition_reveal(year),
+ renderer = gifski_renderer(loop = F)
+)
+anim_save(file = "aids_diagnoses_line")
+```
+
+
+HIV-related Death Rate by Age Group over time: Is HIV-related death more or less common across different age groups over time?
+
+```{r}
+animate(
+  data_clean %>% 
+    filter(age != "All", year != 2015) %>% 
+    select(age, hiv_related_death_rate, year) %>% 
+    group_by(age, year) %>% 
+    summarize(avg_hiv_related_death_rate = mean(hiv_related_death_rate)) %>% 
+    ggplot(aes(x = age, y = avg_hiv_related_death_rate, fill = age))+
+    geom_col()+
+    labs(title = "Year: {frame_time}",
+         x = "Age Group",
+         y = "Average HIV-Related Death Rate (%)")+
+    theme_stata()+
+    theme(legend.position = "none")+
+    transition_time(year)+
+    ease_aes("linear"),
+  render = gifski_renderer()
+)
+anim_save(file = "hiv_related-death_rate_col")
+```
+
+```{r}
+animate( 
+ data_clean %>% 
+    filter(age != "All", year != 2015) %>% 
+    group_by(age, year) %>% 
+    summarize(avg_hiv_related_death_rate = mean(hiv_related_death_rate)) %>% 
+    ggplot(aes(x = year, y = avg_hiv_related_death_rate, color = age))+
+    geom_line()+
+    labs(x = "Year",
+         y = "Average HIV-Related Death Rate (%)",
+         title = "HIV-Related Death Rate Over Time by Age Group (2011-2014)",
+         color = NULL)+
+    theme_stata()+
+   transition_reveal(year),
+ renderer = gifski_renderer(loop = F)
+)
+anim_save(file = "hiv_related_death_rate_line")
+```
+
+Comparison with NYC Demographics
+```{r}
+demo_age_all <- read_csv("data/demo_age_all.csv")
+```
+
+```{r}
+demo_age_all$age_group <- #order levels by age group instead of alphabetical
+  factor(demo_age_all$age_group, 
+         levels = c("under 5 years", "5 to 9 years", "10 to 14 years", "15 to 19 years", "20 to 24 years", "25 to 34 years", "35 to 44 years", "45 to 54 years",
+                    "55 to 59 years", "60 to 64 years", "65 to 74 years", "75 to 84 years", "85 years and over"))
+```
+
+```{r}
+demo_age_all$year <- as.integer(demo_age_all$year)
+```
+
+```{r}
+animate(
+  demo_age_all %>% 
+    ggplot(aes(x = "", y = percent_pop_for_year, fill = age_group))+
+    geom_col(color = "gray50")+
+    coord_polar(theta = "y")+
+    theme_stata()+
+    labs(title = "Year: {frame_time}",
+         fill = NULL,
+         y = NULL,
+         x = "Population")+
+    theme(axis.text.x = element_blank(),
+          legend.text = element_text(size = 9),
+          legend.position = "right")+
+    scale_fill_brewer(palette = "Set3")+
+    transition_time(year)+
+    ease_aes(),
+  renderer = gifski_renderer()
+)
+```
